@@ -1,0 +1,21 @@
+.custom-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #5865f2; /* Discord-like button color */
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+    .custom-button:hover {
+        background-color: #4b5bdc;
+    }
+
+    .custom-button:focus-visible {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        outline-color: #4f46e5; 
+    }
