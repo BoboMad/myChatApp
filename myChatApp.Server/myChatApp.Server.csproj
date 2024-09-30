@@ -7,6 +7,7 @@
     <SpaRoot>..\mychatapp.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:5173</SpaProxyServerUrl>
+    <UserSecretsId>3c6d8ac6-6b7c-4367-af83-4d5d3e08069b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,10 +35,6 @@
     <ProjectReference Include="..\mychatapp.client\mychatapp.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

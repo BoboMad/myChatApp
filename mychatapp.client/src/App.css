@@ -1,1 +1,5 @@
-﻿
+﻿body {
+    font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Symbols';
+    margin: 0;
+    padding: 0;
+}
