@@ -1,0 +1,23 @@
+.hub-container {
+    display: flex; /* Flexbox for horizontal layout */
+    height: 100vh; /* Full viewport height */
+    width: 100vw;
+}
+
+.sidebar-column {
+    width: 250px; /* Fixed width for the sidebar */
+    background-color: #f5f5f5; /* Sidebar background */ 
+    box-sizing: border-box;
+    border-right: 1px solid #ddd; /* Border between sidebar and main content */
+    display: flex; /* Ensure the sidebar content (ChatsSidebar) stays contained */
+    flex-direction: column;
+}
+
+.main-column {
+    flex: 1; /* Take up the remaining space for main content */
+    display: flex;
+    flex-direction: column; /* Stack AddFriends and Chat vertically */
+    background-color: rgb(49,51,56);
+    color:white;
+    box-sizing: border-box;
+}

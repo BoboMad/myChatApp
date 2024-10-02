@@ -35,20 +35,23 @@ namespace myChatApp.Server
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["JWT:Issuer"],
-                        ValidAudience = builder.Configuration["JWT:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
-                    };
-                });
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
+                };
+            });
 
             builder.Services.AddCors(options =>
             {
@@ -56,15 +59,29 @@ namespace myChatApp.Server
                 {
                     policy.WithOrigins("https://localhost:5173")
                     .AllowAnyMethod()
-                    .AllowAnyHeader();
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .WithExposedHeaders("Authorization");
                 });
             });
 
             builder.Services.AddScoped<JwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<FriendService>();
 
             var app = builder.Build();
 
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine($"Request URL: {context.Request.Path}");
+                await next.Invoke();
+                Console.WriteLine($"Response Status: {context.Response.StatusCode}");
+            });
+            app.UseHttpsRedirection();
+            app.UseRouting();
             app.UseCors("AllowFrontend");
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -75,15 +92,8 @@ namespace myChatApp.Server
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
             app.MapControllers();
-
-            app.UseRouting();
             app.MapHub<chatHub>("/chatHub");
-
             app.MapFallbackToFile("/index.html");
 
             app.Run();

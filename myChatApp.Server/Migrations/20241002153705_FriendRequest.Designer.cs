@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using myChatApp.Server.Data.Contexts;
 
@@ -11,9 +12,11 @@ using myChatApp.Server.Data.Contexts;
 namespace myChatApp.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241002153705_FriendRequest")]
+    partial class FriendRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,7 +248,7 @@ namespace myChatApp.Server.Migrations
                     b.ToTable("FriendRequests");
                 });
 
-            modelBuilder.Entity("myChatApp.Server.Models.FriendShip", b =>
+            modelBuilder.Entity("myChatApp.Server.Models.FriendShip+Friendship", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -324,7 +327,7 @@ namespace myChatApp.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("myChatApp.Server.Models.FriendShip", b =>
+            modelBuilder.Entity("myChatApp.Server.Models.FriendShip+Friendship", b =>
                 {
                     b.HasOne("myChatApp.Server.Models.ApplicationUser", "Friend")
                         .WithMany()

@@ -31,7 +31,7 @@ namespace myChatApp.Server.Services
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Issuer"],
+                audience: _configuration["JWT:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(60),
                 signingCredentials: credentials);

@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using static myChatApp.Server.Models.FriendShip;
 
 namespace myChatApp.Server.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public List<Guid> FriendIds { get; set; } = new List<Guid>();
+        public ICollection<FriendShip> Friends { get; set; }
     }
 }
