@@ -10,15 +10,16 @@ namespace myChatApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class FriendController : ControllerBase
     {
         private readonly FriendService _friendService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public FriendController(FriendService friendService)
+        public FriendController(FriendService friendService, UserManager<ApplicationUser> userManager)
         {
             _friendService = friendService;
+            _userManager = userManager;
         }
 
         private Guid GetUserIdFromToken()
@@ -28,10 +29,41 @@ namespace myChatApp.Server.Controllers
             return Guid.Parse(userIdClaim.Value);
         }
 
-        [HttpPost("AddFriend")]
+        [Authorize]
+        [Authorize]
+        [HttpPost("sendfriendrequest")]
+        public async Task<IActionResult> SendFriendRequest([FromBody] string receiverUsername)
+        {
+            var senderId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var result = await _friendService.SendFriendRequest(senderId, receiverUsername);
+            if (result)
+            {
+                return Ok("Friend request sent successfully.");
+            }
+
+            return BadRequest("Friend request could not be sent or already exists.");
+        }
+
+        [Authorize]
+        [HttpPost("acceptfriendrequest/{requestId}")]
+        public async Task<IActionResult> AcceptFriendRequest(Guid requestId)
+        {
+            var result = await _friendService.AcceptFriendRequest(requestId);
+            if (result)
+            {
+                return Ok("Friend request accepted.");
+            }
+
+            return BadRequest("Friend request could not be accepted.");
+        }
+
+        [Authorize]
+        [HttpPost("addfriend")]
         public async Task<IActionResult> AddFriend([FromBody] string friendUsername)
         {
-            
+
+
             var friend = await _userManager.FindByNameAsync(friendUsername);
             if (friend == null) 
             {

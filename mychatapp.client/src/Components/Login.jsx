@@ -63,12 +63,12 @@ const Login = () => {
               <div className="input-container">
 
                 <div className='input-container'>
-                  <label htmlFor="username" className="label">Username <span className="required">*</span> </label>
+                  <label htmlFor="username" className="label">Username</label>
                   <input className='input' type="text" name="username" value={formData.username} onChange={handleChange} required />
                 </div>
 
                   <div className='input-container'>
-                          <label htmlFor="password" className="label">Password <span className="required">*</span> </label>
+                          <label htmlFor="password" className="label">Password</label>
                     <input className='input' type="password" name="password" value={formData.password} onChange={handleChange} required />
                   </div>
 

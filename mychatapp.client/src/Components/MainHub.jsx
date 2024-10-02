@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../Contexts/AuthContext';
-import Chat from './Chat.jsx';
 import ChatsSidebar from './ChatsSideBar.jsx';
-
-import { Outlet, useParams } from 'react-router-dom';
-import AddFriends from './AddFriends';
+import AddFriends from './AddFriends.jsx'
+import '../assets/css/MainHub.css'
 
 const MainHub = () => {
     return (
         <div className="hub-container">
-            <AddFriends/>
-            <ChatsSidebar/>
-            <Chat />
+
+            <div className="sidebar-column">
+                <ChatsSidebar />
+            </div>
+
+            <div className="main-column">
+                <AddFriends/>
+            </div>
+
         </div>
     )
 }
