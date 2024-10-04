@@ -1,9 +1,11 @@
-import {useState} from 'react'
+import { useState, useContext } from 'react'
+import { AuthContext } from '../Contexts/AuthContext';
 import '../assets/css/AddFriend.css'
 
 const AddFriends = () => {
 
     const [friendName, setFriendName] = useState("");
+    const { token } = useContext(AuthContext);
 
     const handleOnNameChange = (e) => {
         setFriendName(e.target.value);
@@ -12,23 +14,22 @@ const AddFriends = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(localStorage.getItem("jwtToken"));
         try {
             const response = await fetch('https://localhost:7292/api/friend/addfriend', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`, // Assuming the JWT is in localStorage
+                    'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(friendName), // Send the friendName as a string
+                body: JSON.stringify(friendName), 
             });
 
-            const result = await response.text(); // Get the response text (could also use `json()` if your API returns JSON)
+            const result = await response.text(); 
 
             if (response.ok) {
-                console.log("User added!"); // Set success message
+                console.log("User added!"); 
             } else {
-                console.log("Failed to add user", result); // Set error message
+                console.log("Failed to add user", result);
             }
         } catch (error) {
             console.log("Error when adding user", error);
