@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using myChatApp.Server.Data.Contexts;
+using myChatApp.Server.Dtos;
+using myChatApp.Server.Hubs;
 using myChatApp.Server.Models;
+using System.Security.Claims;
 
 namespace myChatApp.Server.Services
 {
@@ -9,11 +13,13 @@ namespace myChatApp.Server.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<FriendRequestHub> _friendRequestHub;
 
-        public FriendService(ApplicationDbContext context ,UserManager<ApplicationUser> userManager)
+        public FriendService(ApplicationDbContext context ,UserManager<ApplicationUser> userManager, IHubContext<FriendRequestHub> friendRequestHub)
         {
             _userManager = userManager;
             _context = context;
+            _friendRequestHub = friendRequestHub;
         }
 
         private async Task<ApplicationUser> GetUserByUsernameAsync(string username)
@@ -21,32 +27,36 @@ namespace myChatApp.Server.Services
             return await _userManager.FindByNameAsync(username);
         }
 
-        public async Task<bool> SendFriendRequest(string senderId, string receiverUsername)
+        public async Task<bool> SendFriendRequest(Guid senderId, string receiverUsername)
         {
-            var receiver = await _userManager.FindByNameAsync(receiverUsername);
-            if (receiver == null)
+            var receiverUser = await GetUserByUsernameAsync(receiverUsername);
+
+            if (receiverUser == null || receiverUser.Id == senderId)
             {
                 return false;
             }
 
-            bool requestExists = await _context.FriendRequests.AnyAsync(f => f.SenderId == senderId && f.ReceiverId== receiver.Id && !f.IsAccepted);
-
-            if (requestExists)
+            var existingRequest = await _context.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == senderId && r.ReceiverId == receiverUser.Id && !r.IsAccepted);
+            if (existingRequest != null) 
             {
                 return false;
             }
 
             var friendRequest = new FriendRequest
             {
+                FriendRequestId = Guid.NewGuid(),
                 SenderId = senderId,
-                ReceiverId = receiver.Id,
-                CreatedAt = DateTime.UtcNow
+                ReceiverId = receiverUser.Id,
+                SentAt = DateTime.UtcNow,
+                IsAccepted = false
             };
 
             _context.FriendRequests.Add(friendRequest);
             await _context.SaveChangesAsync();
 
+            var senderUser = await _userManager.FindByIdAsync(senderId.ToString());
 
+            await _friendRequestHub.Clients.User(receiverUser.Id.ToString()).SendAsync("ReceiveFriendRequest", senderUser.UserName);
 
             return true;
         }
@@ -54,57 +64,78 @@ namespace myChatApp.Server.Services
         public async Task<bool> AcceptFriendRequest(Guid requestId)
         {
             var friendRequest = await _context.FriendRequests.FindAsync(requestId);
-            if (friendRequest == null)
+            if (friendRequest == null || friendRequest.IsAccepted)
             {
                 return false;
             }
 
             friendRequest.IsAccepted = true;
-
-            var friendship = new FriendShip
-            {
-                UserId = friendRequest.SenderId,
-                FriendId = friendRequest.ReceiverId,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Friendships.Add(friendship);
             await _context.SaveChangesAsync();
+
+            await AddFriend(friendRequest.SenderId, friendRequest.ReceiverId);
+
+            await _friendRequestHub.Clients.User(friendRequest.SenderId.ToString()).SendAsync("FriendRequestAccepted", friendRequest.Receiver.UserName);
 
             return true;
         }
 
         public async Task<bool> AddFriend(Guid userId, Guid friendId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var alreadyFriends = await _context.Friends.AnyAsync(f => (f.UserId == userId && f.FriendId == friendId) ||
+                                                                      (f.UserId == friendId && f.FriendId == userId));
+            if(alreadyFriends) 
+            { 
+                return false; 
+            }
 
-            //if (user != null && !user.FriendIds.Contains(friendId))
-            //{
-            //    user.FriendIds.Add(friendId);
-            //    await _userManager.UpdateAsync(user);
-            //    return true;
-            //}
-            
+            var friendShip = new Friend
+            {
+                UserId = userId,
+                FriendId = friendId,
+            };
+
+            _context.Friends.Add(friendShip);
+            await _context.SaveChangesAsync();
+
             return false;
         }
 
         public async Task<bool> RemoveFriend(Guid userId, Guid friendId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            //if (user != null && user.FriendIds.Contains(friendId))
-            //{
-            //    user.FriendIds.Remove(friendId);
-            //    await _userManager.UpdateAsync(user);
-            //    return true;
-            //}
-            return false;
+            var friendShip = await _context.Friends.FirstOrDefaultAsync(f => (f.UserId == userId && f.FriendId == friendId) ||
+                                                                       (f.UserId == friendId && f.FriendId == userId));
+
+            if(friendShip == null)
+            {
+                return false;
+            }
+
+             _context.Friends.Remove(friendShip);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public async Task<bool> AlreadyFriends(string userId, string friendId)
+
+        public async Task<List<FriendRequestDto>> GetFriendRequests(Guid userId)
         {
-            return await _context.Friendships.AnyAsync(f =>
-            (f.UserId == userId && f.FriendId == friendId) ||
-            (f.UserId == friendId && f.FriendId == userId));
+            var friendRequests = await _context.FriendRequests
+            .Include(r=>r.Sender)
+            .Include(r=>r.Receiver)
+            .Where(r => r.ReceiverId == userId)
+            .Select(r => new FriendRequestDto
+            {
+                SenderUserId = r.SenderId,
+                SenderUserName = r.Sender.UserName,
+                ReceiverUserId = r.ReceiverId,
+                ReceiverUserName = r.Receiver.UserName,
+                SentAt = r.SentAt,
+            })
+                .ToListAsync();
+
+            return friendRequests;
+
+
         }
     }
 }
