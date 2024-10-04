@@ -31,7 +31,7 @@ namespace myChatApp.Server
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                             options.UseSqlServer(sqldbConnString));
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+            builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
