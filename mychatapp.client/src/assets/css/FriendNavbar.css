@@ -1,0 +1,23 @@
+.friendNavbar-wrapper{
+    display:flex;
+    flex-direction:column;
+}
+
+.friends-tab{
+
+}
+
+.online-tab{
+
+}
+.request-tab{
+
+}
+
+.add-friend-tab{
+
+}
+
+.devider {
+    height:24px;
+}

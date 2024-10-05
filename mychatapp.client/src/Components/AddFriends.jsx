@@ -19,6 +19,7 @@ const AddFriends = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+<<<<<<< Updated upstream
                     'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(friendName), 
@@ -28,6 +29,16 @@ const AddFriends = () => {
 
             if (response.ok) {
                 console.log("User added!"); 
+=======
+                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+                body: JSON.stringify(friendName),
+            });
+
+            const result = await response.text();
+
+            if (response.ok) {
+                console.log("User added!"); // Set success message
             } else {
                 console.log("Failed to add user", result);
             }
@@ -38,6 +49,8 @@ const AddFriends = () => {
 
 
     return (
+        <>
+
         <div className="addFriend-wrapper">
             <div className="addFriend-container">
                 <form className="form" onSubmit={handleSubmit}>
@@ -58,7 +71,9 @@ const AddFriends = () => {
             <div className="image-wrapper">
                 <img src="../../public/addFriends.png" alt="" />
             </div>
-        </div>
+            </div>
+
+        </>
     )
 }
 
