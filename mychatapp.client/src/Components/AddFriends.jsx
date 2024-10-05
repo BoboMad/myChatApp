@@ -19,7 +19,6 @@ const AddFriends = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-<<<<<<< Updated upstream
                     'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(friendName), 
@@ -28,17 +27,7 @@ const AddFriends = () => {
             const result = await response.text(); 
 
             if (response.ok) {
-                console.log("User added!"); 
-=======
-                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
-                },
-                body: JSON.stringify(friendName),
-            });
-
-            const result = await response.text();
-
-            if (response.ok) {
-                console.log("User added!"); // Set success message
+                console.log("User added!");
             } else {
                 console.log("Failed to add user", result);
             }
