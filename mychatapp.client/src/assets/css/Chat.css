@@ -1,0 +1,123 @@
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    background-color: rgb(49,51,56);
+    color: #ffffff;
+}
+
+/* Message List */
+.message-list {
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 20px; 
+}
+
+
+.message-wrapper {
+    display: flex;
+    margin-bottom:16px;
+}
+
+    .message-wrapper.sent {
+        justify-content: start; /* Align sent messages to the right */
+    }
+
+    .message-wrapper.received {
+        justify-content: flex-start; /* Align received messages to the left */
+    }
+
+
+.message-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.sender {
+    font-weight: bold;
+    font-size: 15px; /* Discord uses slightly larger text for names */
+    color: #ffffff; /* Bright white text for the sender's name */
+    margin-right: 10px; /* Space between sender's name and timestamp */
+}
+
+.timestamp {
+    font-size: 10px; /* Smaller font for the timestamp */
+    color: #b9bbbe; /* Discord uses a grey color for timestamps */
+}
+
+/* Message Item */
+.message-item {
+
+}
+
+/* Input Container */
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+    background-color: #36393f;
+    margin: 1rem;
+    border-radius: 8px;
+    justify-content: center;
+}
+
+    /* Input Field */
+    .chat-input-container input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #40444b;
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .chat-input-container textarea {
+        max-height: 50vh;
+        resize: none;
+        overflow: hidden;
+        min-height: 30px;
+        width: 100%;
+        background-color: #36393f;
+        outline: none;
+        overflow-y: scroll;
+        padding: 3px 3px;
+    }
+
+        .chat-input-container textarea::-webkit-scrollbar {
+            width: 6px; /* Width of the scrollbar */
+            background-color: none; /* Background of the scrollbar track */
+        }
+
+        .chat-input-container textarea::-webkit-scrollbar-thumb {
+            background-color: #555; /* Color of the scrollbar thumb */
+            border-radius: 10px; /* Rounded corners for the thumb */
+        }
+
+        .chat-input-container textarea::-webkit-scrollbar-thumb:hover {
+            background-color: #777; /* Color of the thumb on hover */
+        }
+
+        .chat-input-container textarea::-webkit-scrollbar-track {
+            background-color: none; /* Background of the scrollbar track */
+            border-radius: 10px; /* Rounded corners for the track */
+        }
+
+
+    /* Button */
+    .chat-input-container button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #7289da;
+        color: #ffffff;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+
+        /* Button hover effect */
+        .chat-input-container button:hover {
+            background-color: #5b6eae;
+        }

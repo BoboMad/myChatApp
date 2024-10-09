@@ -1,8 +1,9 @@
 import { useState, useContext } from 'react'
-import '../assets/css/login-register.css'
-import '../assets/css/buttons.css'
-import { AuthContext } from '../Contexts/AuthContext';
-import {Navigate }  from 'react-router-dom'
+import '../../assets/css/login-register.css'
+import '../../assets/css/buttons.css'
+import { AuthContext } from '../../Contexts/AuthContext';
+import { useNavigate } from 'react-router-dom'
+
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -11,12 +12,11 @@ const Login = () => {
 
     });
 
+    const navigate = useNavigate();
+
     const [message, setMessage] = useState("");
     const { token, updateToken, isAuthenticated } = useContext(AuthContext);
 
-    if (isAuthenticated) {
-       return <Navigate to="/chat" />
-    }
 
     const handleChange = (e) => {
         setFormData({
@@ -40,8 +40,9 @@ const Login = () => {
             if (response.ok) {
                 const data = await response.json();
                 updateToken(data.token);
-                localStorage.setItem('jwtToken', data.token)
+                localStorage.setItem('jwtToken', data.Token)
                 setMessage('Login successful!');
+                navigate("/me")
             }
             else {
                 setMessage('Login failed, please check your credentials.')

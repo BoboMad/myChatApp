@@ -16,6 +16,10 @@ namespace myChatApp.Server.Data.Contexts
         public DbSet<FriendRequest> FriendRequests { get; set; }
         public DbSet<Friend> Friends { get; set; }
 
+        public DbSet<ChatRoom> ChatRooms { get; set; }
+
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

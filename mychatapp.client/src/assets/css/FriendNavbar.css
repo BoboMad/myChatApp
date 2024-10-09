@@ -1,23 +1,33 @@
-.friendNavbar-wrapper{
-    display:flex;
-    flex-direction:column;
+.friendNavbar-wrapper {
+    display: flex;
+    background-color: rgb(49,51,56);
+    border-bottom: 1px solid rgb(44,46,51);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    align-items:center;
+    padding: 8px 16px;
 }
 
-.friends-tab{
+    .friendNavbar-wrapper .friends-tab, .online-tab, .request-tab, .add-friend-tab {
+        color: #ecf0f1;
+        text-align: center;
+        padding: 5px;
+        border-radius:4px;
+        cursor: pointer;
+        transition: color 0.3s, background-color 0.3s;
+    }
 
-}
-
-.online-tab{
-
-}
-.request-tab{
-
-}
-
-.add-friend-tab{
-
-}
+        .friendNavbar-wrapper .friends-tab:hover, .online-tab:hover, .request-tab:hover, .add-friend-tab:hover {
+            background-color: rgb(67,68,75);
+        }
 
 .devider {
-    height:24px;
+    width: 1px;
+    height: 24px;
+    margin-left: 8px;
+    margin-right: 8px;
+    background-color: #7f8c8d;
+}
+
+.friendNavbar-wrapper .active {
+    background-color: rgb(67,68,75);
 }

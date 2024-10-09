@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react'
-import { AuthContext } from '../Contexts/AuthContext';
-import '../assets/css/AddFriend.css'
+import { AuthContext } from '../../Contexts/AuthContext';
+import '../../assets/css/AddFriend.css'
 
 const AddFriends = () => {
 
@@ -15,7 +15,7 @@ const AddFriends = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch('https://localhost:7292/api/friend/addfriend', {
+            const response = await fetch('https://localhost:7292/api/friend/sendfriendrequest', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

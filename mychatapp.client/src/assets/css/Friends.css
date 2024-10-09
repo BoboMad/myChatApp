@@ -1,0 +1,49 @@
+.friends-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(153,158,165, 0.30);
+}
+
+    .content-wrapper:hover {
+        background-color: rgb(57,60,65);
+    }
+
+.friend-info {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.status {
+    font-size: 0.8rem;
+    color: rgb(153,158,165);
+    text-transform:uppercase;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+.button-wrapper {
+    margin-right: 16px;
+}
+
+.friend-button {
+    background-color: rgb(43,45,49);
+    border-radius: 50%;
+    height: 36px;
+    width: 36px;
+    margin-right: 8px;
+}

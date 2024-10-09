@@ -17,10 +17,23 @@ namespace myChatApp.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSignalR();
+
+            builder.Services.AddSignalR(hubOptions =>
+            {
+                hubOptions.EnableDetailedErrors = true;
+            })
+            .AddJsonProtocol(options => {
+                options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+            });
+
+            builder.Logging.AddConsole();
 
             if (builder.Environment.IsDevelopment())
             {
@@ -51,6 +64,20 @@ namespace myChatApp.Server
                     ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!))
                 };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chatHub") || path.StartsWithSegments("/FriendRequestHub")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             builder.Services.AddCors(options =>
@@ -67,6 +94,8 @@ namespace myChatApp.Server
 
             builder.Services.AddScoped<JwtTokenService, JwtTokenService>();
             builder.Services.AddScoped<FriendService>();
+            builder.Services.AddScoped<ChatRoomService>();
+            builder.Services.AddScoped<ChatMessageService>();
 
             var app = builder.Build();
 
@@ -94,6 +123,7 @@ namespace myChatApp.Server
 
             app.MapControllers();
             app.MapHub<chatHub>("/chatHub");
+            app.MapHub<FriendRequestHub>("/friendRequestHub");
             app.MapFallbackToFile("/index.html");
 
             app.Run();

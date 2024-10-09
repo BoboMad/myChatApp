@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
-import '../assets/css/buttons.css'
-import '../assets/css/login-register.css'
-import { AuthContext } from '../Contexts/AuthContext'
+import '../../assets/css/buttons.css'
+import '../../assets/css/login-register.css'
+import { AuthContext } from '../../Contexts/AuthContext'
 import {Navigate } from 'react-router-dom'
 
 const Register = () => {
@@ -18,7 +18,7 @@ const Register = () => {
     const { isAuthenticated } = useContext(AuthContext);
 
     if (isAuthenticated) {
-        return <Navigate to="/chat" />
+        return <Navigate to="/me" />
     }
 
     const handleChange = (e) => {
@@ -41,7 +41,7 @@ const Register = () => {
 
             if(response.ok){
                 SetMessage('User registration successful!');
-                <Navigate to='/chat'/>
+                <Navigate to='/me'/>
             }
             else{
                 SetMessage('User registration failed, please try agian.')

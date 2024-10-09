@@ -1,4 +1,6 @@
-﻿namespace myChatApp.Server.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace myChatApp.Server.Models
 {
     public class ChatRoom
     {
@@ -6,5 +8,6 @@
         public string Name { get; set; } = null!;
         public List<Guid> Users { get; set; }
         public DateTime CreationDate { get; set; }
+        public bool IsGroupChat { get; set; }
     }
 }

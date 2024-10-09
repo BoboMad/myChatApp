@@ -56,14 +56,28 @@ namespace myChatApp.Server.Services
 
             var senderUser = await _userManager.FindByIdAsync(senderId.ToString());
 
-            await _friendRequestHub.Clients.User(receiverUser.Id.ToString()).SendAsync("ReceiveFriendRequest", senderUser.UserName);
+            var friendRequestDto = new FriendRequestDto
+            {
+                FriendRequestId = friendRequest.FriendRequestId,
+                SenderUserId = friendRequest.SenderId,
+                ReceiverUserId = friendRequest.ReceiverId,
+                SenderUserName = friendRequest.Sender.UserName,
+                ReceiverUserName = friendRequest.Receiver.UserName,
+                SentAt = friendRequest.SentAt,
+            };
+
+            await _friendRequestHub.Clients.User(receiverUser.Id.ToString()).SendAsync("ReceiveFriendRequest", friendRequestDto);
 
             return true;
         }
 
         public async Task<bool> AcceptFriendRequest(Guid requestId)
         {
-            var friendRequest = await _context.FriendRequests.FindAsync(requestId);
+            var friendRequest = await _context.FriendRequests
+                .Include(fr => fr.Receiver)
+                .Include(fr => fr.Sender)
+                .FirstOrDefaultAsync(fr => fr.FriendRequestId == requestId);
+
             if (friendRequest == null || friendRequest.IsAccepted)
             {
                 return false;
@@ -74,8 +88,31 @@ namespace myChatApp.Server.Services
 
             await AddFriend(friendRequest.SenderId, friendRequest.ReceiverId);
 
-            await _friendRequestHub.Clients.User(friendRequest.SenderId.ToString()).SendAsync("FriendRequestAccepted", friendRequest.Receiver.UserName);
+            var friendRequestDto = new FriendRequestDto
+            {
+                 FriendRequestId = friendRequest.FriendRequestId,
+                 SenderUserId = friendRequest.SenderId,
+                 ReceiverUserId = friendRequest.ReceiverId,
+                 SenderUserName = friendRequest.Sender.UserName,
+                 ReceiverUserName = friendRequest.Receiver.UserName,
+                 SentAt = friendRequest.SentAt,
+    };
 
+            await _friendRequestHub.Clients.User(friendRequest.SenderId.ToString()).SendAsync("FriendRequestAccepted", friendRequestDto);
+
+            return true;
+        }
+
+        public async Task<bool> DeclineFriendRequest(Guid requestId)
+        {
+            var request = await _context.FriendRequests.FindAsync(requestId);
+            if (request == null)
+            {
+                return false;
+            }
+
+            _context.FriendRequests.Remove(request);
+            await _context.SaveChangesAsync();
             return true;
         }
 
@@ -122,9 +159,10 @@ namespace myChatApp.Server.Services
             var friendRequests = await _context.FriendRequests
             .Include(r=>r.Sender)
             .Include(r=>r.Receiver)
-            .Where(r => r.ReceiverId == userId)
+            .Where(r => r.ReceiverId == userId && !r.IsAccepted)
             .Select(r => new FriendRequestDto
             {
+                FriendRequestId = r.FriendRequestId,
                 SenderUserId = r.SenderId,
                 SenderUserName = r.Sender.UserName,
                 ReceiverUserId = r.ReceiverId,
@@ -135,7 +173,22 @@ namespace myChatApp.Server.Services
 
             return friendRequests;
 
+        }
 
+        public async Task<List<FriendDto>> GetFriends(Guid userId)
+        {
+            var friends = await _context.Friends
+                .Include(f => f.User)
+                .Include(f => f.FriendUser)
+                .Where(f => f.FriendId == userId || f.UserId == userId)
+                .Select(f => new FriendDto
+                {
+                    FriendId = f.UserId == userId ? f.FriendId : f.UserId,
+                    FriendUsername = f.UserId == userId ? f.FriendUser.UserName : f.User.UserName
+                })
+                .ToListAsync();
+
+            return friends;
         }
     }
 }

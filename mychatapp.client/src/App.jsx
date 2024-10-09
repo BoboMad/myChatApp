@@ -1,10 +1,15 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import ProtectedRoute from './Components/ProtectedRoute'
-import Login from './Components/Login.jsx'
-import Register from './Components/Register.jsx'
-import MainHub from './Components/MainHub.jsx'
+import Login from './Components/Login-register/Login.jsx'
+import Register from './Components/Login-register/Register.jsx'
+import MainLayout from './Components/MainLayout.jsx'
+import FriendLayout from './Components/Friends/FriendLayout.jsx'
 import { AuthProvider } from './Contexts/AuthContext'
+import { SignalRChatProvider } from './contexts/SignalRChatContext';
+import { FriendRequestProvider } from './Contexts/FriendRequestContext';
+import ChatContainer from './Components/Chat/ChatContainer';
+
 
 function App() {
 
@@ -15,11 +20,20 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 
-                    <Route path="/chat" element={<ProtectedRoute>
-                                                    <MainHub />
-                                                 </ProtectedRoute>} />
+                    <Route path="/" element={
+                        <ProtectedRoute>
+                            <SignalRChatProvider>
+                                <FriendRequestProvider>
+                                    <MainLayout />
+                                </FriendRequestProvider>
+                            </SignalRChatProvider>
+                        </ProtectedRoute>
+                    }>
+ 
+                        <Route path="me/chat/:id" element={<ChatContainer />} />
+                        <Route path="me" element={<FriendLayout />} />
 
-                    <Route path='*' element={<Navigate to="/chat"/> }/>
+                    </Route>
                 </Routes>
             </Router>
 

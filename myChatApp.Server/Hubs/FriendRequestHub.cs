@@ -1,21 +1,24 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using myChatApp.Server.Dtos;
 using System.Security.Claims;
 
 namespace myChatApp.Server.Hubs
 {
+    [Authorize]
     public class FriendRequestHub : Hub
     {
         // Send friend request notification to specific client
-        public async Task SendFriendRequestNotification(Guid reciverId, string senderUsername)
+        public async Task SendFriendRequestNotification(Guid reciverId, FriendRequestDto friendRequestDto)
         {
-            await Clients.User(reciverId.ToString()).SendAsync("ReceiveFriendRequest", senderUsername);
+            await Clients.User(reciverId.ToString()).SendAsync("ReceiveFriendRequest", friendRequestDto);
         }
 
 
         //Send accepted notification to specific client
-        public async Task SendFriendRequestAcceptedNotification(Guid receiverId, string senderUsername)
+        public async Task SendFriendRequestAcceptedNotification(Guid receiverId, FriendRequestDto friendRequestDto)
         {
-            await Clients.User(receiverId.ToString()).SendAsync("FriendRequestAccepted", senderUsername);
+            await Clients.User(receiverId.ToString()).SendAsync("FriendRequestAccepted", friendRequestDto);
         }
 
         //When connecting

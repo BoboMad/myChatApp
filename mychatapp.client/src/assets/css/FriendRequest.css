@@ -1,0 +1,64 @@
+.friend-request-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding:16px;
+}
+
+.friend-request-wrapper h2 {
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.request-info{
+    display:flex;
+    flex-direction:column;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(153,158,165, 0.30);
+}
+
+    .content-wrapper:hover {
+        background-color: rgb(57,60,65);
+    }
+
+
+
+.info {
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    color: rgb(153,158,165);
+}
+
+
+.button-wrapper {
+    margin-right: 16px;
+}
+
+.request-button {
+    background-color: rgb(43,45,49);
+    border-radius: 50%;
+    height: 36px;
+    width: 36px;
+    margin-right: 8px;
+}
+
+    .request-button:hover .fa-check{
+        color:green;
+    }
+
+    .request-button:hover .fa-xmark {
+        color: red;
+    }

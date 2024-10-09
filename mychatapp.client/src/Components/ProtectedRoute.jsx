@@ -3,7 +3,12 @@ import { useContext } from 'react';
 import { AuthContext } from '../Contexts/AuthContext'
 
 const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, loading } = useContext(AuthContext);
+
+    if (loading) {
+        // You can render a loading spinner or a placeholder while loading the auth state
+        return <div>Loading...</div>;
+    }
 
     if (!isAuthenticated) {
         return <Navigate to='/login'/>

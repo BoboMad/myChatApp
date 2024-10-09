@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using myChatApp.Server.Data.Contexts;
 using myChatApp.Server.Dtos;
+using myChatApp.Server.Hubs;
 using myChatApp.Server.Models;
 using myChatApp.Server.Services;
 using System.Security.Claims;
@@ -63,7 +65,20 @@ namespace myChatApp.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("getfriendrequests")]
+        [HttpPost("declinefriendrequest/{requestId}")]
+        public async Task<IActionResult> DeclineFriendRequest(Guid requestId)
+        {
+            var result = await _friendService.DeclineFriendRequest(requestId);
+            if (!result)
+            {
+                return BadRequest("Friend request could not be declined");
+            }
+
+            return Ok("Friend request declined successfully.");
+        }
+
+        [Authorize]
+        [HttpGet("getfriendrequests")]
         public async Task<IActionResult> GetFriendRequests()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -76,6 +91,30 @@ namespace myChatApp.Server.Controllers
 
             var friendRequests = await _friendService.GetFriendRequests(userId);
             return Ok(friendRequests);
+        }
+
+
+        [Authorize]
+        [HttpGet("getfriends")]
+        public async Task<IActionResult> GetFriends()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+            {
+                return BadRequest("User not found.");
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var friends = await _friendService.GetFriends(userId);
+            return Ok(friends);
+        }
+
+        [Authorize]
+        [HttpDelete()]
+        public async Task<IActionResult> RemoveFriend()
+        {
+            return Ok("");
         }
     }
 }
