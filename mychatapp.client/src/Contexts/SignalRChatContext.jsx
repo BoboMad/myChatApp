@@ -46,11 +46,18 @@ export const SignalRChatProvider = ({ children }) => {
         };
     }, [connection]);
 
-    const JoinRoom = async (friendId) => {
+    const JoinRoom = async (friendIdOrIds) => {
 
         if (connection && connection.state === "Connected") {
             try {
-                    await connection.invoke("JoinRoom", [friendId, userId]);
+                let userIds;
+                if (Array.isArray(friendIdOrIds)) {
+                    userIds = friendIdOrIds;
+                }
+                else {
+                    userIds = [friendIdOrIds, userId]
+                }
+                    await connection.invoke("JoinRoom", userIds);
                 }
              catch (error) {
                 console.error("Failed to create or join room", error);
@@ -73,12 +80,12 @@ export const SignalRChatProvider = ({ children }) => {
         }
     };
 
-    const fetchChatMessagesForRoom = async () => {
+    const fetchChatMessagesForRoom = async (roomId) => {
 
-        if (isAuthenticated) {
+        if (isAuthenticated && roomId) {
 
             try {
-                const response = await fetch(`https://localhost:7292/api/ChatMessage/${currentRoomId}`, {
+                const response = await fetch(`https://localhost:7292/api/ChatMessage/${roomId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -105,7 +112,9 @@ export const SignalRChatProvider = ({ children }) => {
             sendMessage,
             fetchChatMessagesForRoom,
             JoinRoom,
-            messages
+            messages,
+            currentRoomId,
+            setCurrentRoomId
             }}>
             {children}
         </SignalRChatContext.Provider>

@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom'
-import ChatsSidebarContainer from '../Components/ChatSideBar/ChatSideBarContainer';
-
+import ChatRoomList from './ChatSideBar/ChatRoomList.jsx'
 
 import '../assets/css/MainLayout.css';
 
@@ -10,7 +9,7 @@ const MainLayout = () => {
         <div className="hub-container">
 
             <div className="sidebar-column">
-                <ChatsSidebarContainer/>
+                <ChatRoomList/>
             </div>
 
             <div className="main-column">
