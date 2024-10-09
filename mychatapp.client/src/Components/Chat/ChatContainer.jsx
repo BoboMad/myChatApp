@@ -7,7 +7,7 @@ import '../../assets/css/Chat.css';
 const ChatContainer = () => {
     const [message, SetMessage] = useState('')
 
-    const { sendMessage, messages, fetchChatMessagesForRoom, setCurrentRoomId } = useContext(SignalRChatContext)
+    const { sendMessage, messages, fetchChatMessagesForRoom, setCurrentRoomId, isLoading } = useContext(SignalRChatContext)
     const { userId } = useContext(AuthContext)
 
     const messageEndRef = useRef(null);
@@ -20,7 +20,7 @@ const ChatContainer = () => {
             setCurrentRoomId(roomId);
             fetchChatMessagesForRoom(roomId);
         }
-    }, [roomId, setCurrentRoomId, fetchChatMessagesForRoom]);
+    }, [roomId, setCurrentRoomId]);
 
 
     const handleInputChange = (e) => {
@@ -52,6 +52,11 @@ const ChatContainer = () => {
             inputRef.current.style.height = inputRef.current.scrollHeight + "px";
         }
     }, [message]);
+
+
+    if (isLoading) {
+        return <div>Loading messages...</div>;
+    }
 
     return (
         <div className="chat-container">

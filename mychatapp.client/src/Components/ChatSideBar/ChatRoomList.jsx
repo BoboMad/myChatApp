@@ -9,7 +9,7 @@ const ChatRoomList = () => {
     const { fetchChatMessagesForRoom, setCurrentRoomId } = useContext(SignalRChatContext);
     const { token } = useContext(AuthContext);
     const [chatRooms, SetChatRooms] = useState([]);
-
+    const [isLoadingRooms, setIsLoadingRooms] = useState(false);
 
 
     useEffect(() => {
@@ -45,6 +45,10 @@ const ChatRoomList = () => {
             console.error("Error joining room:", error);
         }
     };
+
+    if (isLoadingRooms) {
+        return <div>Loading rooms...</div>;
+    }
 
     return (
 

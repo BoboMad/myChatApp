@@ -11,6 +11,7 @@ export const SignalRChatProvider = ({ children }) => {
     const [connection, setConnection] = useState(null);
     const [messages, setMessages] = useState([]);
     const [currentRoomId, setCurrentRoomId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -83,7 +84,8 @@ export const SignalRChatProvider = ({ children }) => {
     const fetchChatMessagesForRoom = async (roomId) => {
 
         if (isAuthenticated && roomId) {
-
+            console.log("FetchMessages ")
+            setIsLoading(true);
             try {
                 const response = await fetch(`https://localhost:7292/api/ChatMessage/${roomId}`, {
                     method: 'GET',
@@ -103,6 +105,9 @@ export const SignalRChatProvider = ({ children }) => {
             catch (error) {
                 console.error("Error fetching messages", error);
             }
+            finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -114,7 +119,9 @@ export const SignalRChatProvider = ({ children }) => {
             JoinRoom,
             messages,
             currentRoomId,
-            setCurrentRoomId
+            setCurrentRoomId,
+            isLoading,
+            setIsLoading
             }}>
             {children}
         </SignalRChatContext.Provider>
