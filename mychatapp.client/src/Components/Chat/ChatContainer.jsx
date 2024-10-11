@@ -7,11 +7,13 @@ import '../../assets/css/Chat.css';
 const ChatContainer = () => {
     const [message, SetMessage] = useState('')
 
-    const { sendMessage, messages, fetchChatMessagesForRoom, setCurrentRoomId, isLoading } = useContext(SignalRChatContext)
+    const { sendMessage, messages, fetchChatMessagesForRoom, setCurrentRoomId, isLoading, fetchFriends, friends, addUsersToRoom } = useContext(SignalRChatContext)
     const { userId } = useContext(AuthContext)
+    const [showFriendsList, setShowFriendsList] = useState(false)
 
     const messageEndRef = useRef(null);
     const inputRef = useRef(null);
+    const friendsListRef = useRef(null);
     const { id: roomId } = useParams();
 
 
@@ -53,6 +55,34 @@ const ChatContainer = () => {
         }
     }, [message]);
 
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (friendsListRef.current && !friendsListRef.current.contains(event.target)) {
+                setShowFriendsList(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [friendsListRef]);
+
+    const toggleFriendsList = () => {
+        setShowFriendsList(!showFriendsList);
+        if (!showFriendsList) {
+            fetchFriends();
+        }
+    };
+
+    const addFriendToChat = async (friendId) => {
+        try {
+            await addUsersToRoom(roomId, [friendId]);
+            setShowFriendsList(false);
+        } catch (error) {
+            console.error('Error adding friend to chat:', error);
+        }
+    };
 
     if (isLoading) {
         return <div>Loading messages...</div>;
@@ -63,8 +93,30 @@ const ChatContainer = () => {
             <div className="title-bar">
                 <div className="user-info">
                     <span>Room ID: {roomId}</span>
+
+                <div className="friends-dropdown" ref={friendsListRef}>
+                    <button onClick={toggleFriendsList}>
+                            <i className="fa-solid fa-user-plus"></i>
+                    </button>
+                
+                
+                {showFriendsList && (
+                    <div className="friends-list">
+                        <h3>Choose a friend to add:</h3>
+                        {friends.map(friend => (
+                            <div key={friend.FriendId} className="friend-item" onClick={(e) => {
+                                e.stopPropagation();
+                                addFriendToChat(friend.FriendId)
+                            }}>
+                                {friend.FriendUsername}
+                            </div>
+                        ))}
+                    </div>
+                    )}
+                    </div>
                 </div>
             </div>
+
 
             <div className="message-list">
                 {messages && messages.map((msg, index) => (

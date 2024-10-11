@@ -25,10 +25,15 @@ namespace myChatApp.Server.Services
 
         public async Task<ChatMessageDto> CreateChatMessageDto(ChatMessage chatMessage)
         {
-            var senderName = await _context.Users
+            var senderName = chatMessage.Sender;
+            if(chatMessage.Sender != "system")
+            {
+             senderName = await _context.Users
                 .Where(u => u.Id == chatMessage.UserId)
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
+
+            }
 
             if (senderName == null)
             {
@@ -69,6 +74,12 @@ namespace myChatApp.Server.Services
         {
             _context.ChatMessages.Add(message);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<string> GetUsernameFromId(Guid userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            return user.UserName;
         }
     }
 }

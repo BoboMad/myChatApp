@@ -5,6 +5,8 @@
     width: 100%;
     background-color: rgb(49,51,56);
     color: #ffffff;
+    position: relative;
+    overflow: hidden;
 }
 
 /* Message List */
@@ -121,3 +123,54 @@
         .chat-input-container button:hover {
             background-color: #5b6eae;
         }
+
+
+.title-bar {
+    display: flex;
+    flex-direction:row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: rgb(49,51,56);
+    z-index: 10;
+    position: relative;
+}
+
+    .title-bar button {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: rgb(49,51,56);
+    }
+
+.friends-dropdown {
+    position: relative;
+}
+
+.friends-list {
+    background-color: rgb(49,51,56);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-radius: 4px;
+    width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+    .friends-list h3 {
+        margin-top: 0;
+    }
+
+.friend-item {
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .friend-item:hover {
+        background-color: #e0e0e0;
+    }

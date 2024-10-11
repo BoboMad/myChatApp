@@ -7,7 +7,8 @@ namespace myChatApp.Server.Models
     {
         [Key]
         public Guid MessageId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
+        public string Sender { get; set; }
         public Guid RoomId { get; set; }
         public string Message { get; set; }
         public DateTime TimeStamp { get; set; }

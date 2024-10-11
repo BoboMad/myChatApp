@@ -83,5 +83,32 @@ namespace myChatApp.Server.Services
                 .ToListAsync();
 
         }
+
+
+        public async Task AddUsersToRoom(Guid roomId, List<Guid> newUserIds)
+        {
+            var room = await _context.ChatRooms.FindAsync(roomId);
+            if (room == null)
+            {
+                throw new Exception("Room not found");
+            }
+
+            foreach (var userId in newUserIds)
+            {
+                if (!room.Users.Contains(userId))
+                {
+                    room.Users.Add(userId);
+                }
+            }
+
+            room.IsGroupChat = room.Users.Count > 2;
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<string?>> GetUsername(List<Guid> userIds)
+        {
+            return await _context.Users.Where(u => userIds.Contains(u.Id)).Select(u => u.UserName).ToListAsync();
+        }
     }
 }

@@ -11,6 +11,7 @@ export const SignalRChatProvider = ({ children }) => {
     const [connection, setConnection] = useState(null);
     const [messages, setMessages] = useState([]);
     const [currentRoomId, setCurrentRoomId] = useState(null);
+    const [friends, SetFriends] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -33,15 +34,22 @@ export const SignalRChatProvider = ({ children }) => {
         });
 
         connection.on('ReceiveRoomId', (roomId) => {
-            console.log('Received Room ID:', roomId);
             setCurrentRoomId(roomId);
             navigate(`/me/chat/${roomId}`);
-        })
+        });
+
+        connection.on('UsersAddedToRoom', (roomId, usernames) => {
+            console.log("Entered UsersAddedToRoom")
+            var message = `${usernames.join(', ')} ${usernames.length > 1 ? 'have' : 'has'} been added to the room.`;
+            connection.invoke('SendSystemMessage',roomId, message)
+            
+        });
 
         return () => {
             if (connection) {
                 connection.off('ReceiveMessage');
                 connection.off('ReceiveRoomId');
+                connection.off('UsersAddedToRoom');
                 connection.stop();
             }
         };
@@ -68,6 +76,17 @@ export const SignalRChatProvider = ({ children }) => {
         }
     };
 
+    const addUsersToRoom = async (roomId, userIds) => {
+        if (connection && connection.state === "Connected") {
+            try {
+                await connection.invoke("AddUsersToRoom", roomId, userIds);
+            } catch (error) {
+                console.error("Failed to add users to room", error);
+            }
+        } else {
+            console.error("SignalR connection is not established");
+        }
+    };
 
     const sendMessage = async (message) => {
         if (connection && connection.state === "Connected" && currentRoomId) {
@@ -111,6 +130,24 @@ export const SignalRChatProvider = ({ children }) => {
         }
     };
 
+    const fetchFriends = async () => {
+        try {
+            const response = await fetch('https://localhost:7292/api/Friend/getfriends', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch friends');
+            }
+            const data = await response.json();
+            SetFriends(data);
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+        }
+    };
+
     return (
         <SignalRChatContext.Provider value={{
             connection,
@@ -121,7 +158,11 @@ export const SignalRChatProvider = ({ children }) => {
             currentRoomId,
             setCurrentRoomId,
             isLoading,
-            setIsLoading
+            setIsLoading,
+            addUsersToRoom,
+            fetchFriends,
+            friends,
+
             }}>
             {children}
         </SignalRChatContext.Provider>

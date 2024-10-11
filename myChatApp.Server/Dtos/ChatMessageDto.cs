@@ -17,7 +17,7 @@ namespace myChatApp.Server.Dtos
         public string Sender { get; set; }
 
         [JsonPropertyName("SenderId")]
-        public Guid SenderId { get; set; }
+        public Guid? SenderId { get; set; }
 
         [JsonPropertyName("TimeStamp")]
         public DateTime TimeStamp { get; set; }

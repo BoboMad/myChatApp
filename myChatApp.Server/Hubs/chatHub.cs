@@ -54,14 +54,28 @@ namespace myChatApp.Server.Hubs
             }
         }
 
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = GetUserIdFromToken();
+            var rooms = await _chatRoomService.GetUserChatRooms(userId);
+
+            foreach (var room in rooms)
+            {
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Id.ToString());
+            }
+
+            await base.OnDisconnectedAsync(exception);
+        }
         public async Task SendMessage(Guid roomId, string message)
         {
             var userId = GetUserIdFromToken();
+            
             var chatMessage = new ChatMessage
             {
                 MessageId = Guid.NewGuid(),
                 RoomId = roomId,
                 UserId = userId,
+                Sender = await _chatMessageService.GetUsernameFromId(userId),
                 Message = message,
                 TimeStamp = DateTime.UtcNow
             };
@@ -72,7 +86,6 @@ namespace myChatApp.Server.Hubs
 
              await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage", chatMessageDto);
         }
-
 
         public async Task JoinRoom(List<Guid> userIds)
         {
@@ -95,17 +108,53 @@ namespace myChatApp.Server.Hubs
             }
         }
 
-        public override async Task OnDisconnectedAsync(Exception? exception)
+        public async Task AddUsersToRoom(Guid roomId, List<Guid> newUserIds)
         {
-            var userId = GetUserIdFromToken();
-            var rooms = await _chatRoomService.GetUserChatRooms(userId);
-
-            foreach (var room in rooms)
+            try
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.Id.ToString());
-            }
+                var currenUserId = GetUserIdFromToken();
 
-            await base.OnDisconnectedAsync(exception);
+                await _chatRoomService.AddUsersToRoom(roomId, newUserIds);
+
+                var usernames = await _chatRoomService.GetUsername(newUserIds);
+
+                await Clients.Group(roomId.ToString()).SendAsync("UsersAddedToRoom", roomId, usernames);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error in AddUsersToRoom: {ex.Message}");
+                Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
+                throw;
+            }
+        }
+
+        public async Task SendSystemMessage(Guid roomId, string message)
+        {
+
+
+            var chatMessage = new ChatMessage
+            {
+                MessageId = Guid.NewGuid(),
+                UserId = null,
+                Sender = "system",
+                RoomId = roomId,
+                Message = message,
+                TimeStamp = DateTime.Now,
+            };
+
+            await _chatMessageService.SaveMessage(chatMessage);
+
+            var chatMessageDto = new ChatMessageDto
+            {
+                MessageId = Guid.NewGuid(),
+                RoomId = roomId,
+                Sender = "system",
+                SenderId = null,
+                Message = message,
+                TimeStamp = DateTime.UtcNow
+            };
+
+            await Clients.Group(roomId.ToString()).SendAsync("ReceiveMessage", chatMessageDto);
         }
     }
 }

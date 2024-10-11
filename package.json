@@ -7,14 +7,12 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@microsoft/signalr": "^8.0.7",
+    "autoprefixer": "^10.4.20",
     "jwt-decode": "^4.0.0",
+    "postcss": "^8.4.47",
     "prop-types": "^15.8.1",
     "react-router-dom": "^6.26.2",
-    "react-toastify": "^10.0.5"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
+    "react-toastify": "^10.0.5",
     "tailwindcss": "^3.4.13"
   }
 }
